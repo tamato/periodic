@@ -1,0 +1,17 @@
+{
+  "name": "periodic",
+  "version": "1.0.0",
+  "description": "Report periodic data for a given search term",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "terry amato",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^4.0.1"
+  },
+  "bin": {
+    "filterPeriodicData": "./index.js"
+  }
+}
