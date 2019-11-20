@@ -6,6 +6,7 @@
 // form:
 //  https://stackoverflow.com/questions/1880198/how-to-execute-shell-command-in-javascript
 var execSync = require('child_process').execSync;
+var parse = require('csv-parse');
 
 var program = require('commander'); // npm install --save commander
 program
@@ -44,9 +45,9 @@ if (program.file) {
 }
 
 const fs = require('fs');
+const readline = require('readline');
 
 const fileStream = fs.createReadStream(target);
-const readline = require('readline');
 const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity
@@ -74,17 +75,10 @@ rl.on('line', (line) => {
     console.log("Printing Column header followed by the line number for the entry and its value")
     // print out the contents of the columnHeaders
     var validLines = [];
-    var data = {};
     for (i=0; i<columnNumbs.length; i++) {
         var col = columnNumbs[i];
         console.log("-------------------------------------");
         console.log(`${columnHeaders[col]}`)
-
-        if ( i == 0 ) {
-            data[0] = [columnHeaders[col]];
-        } else {
-            data[0].push(columnHeaders[col]);
-        }
 
         for (j=3; j<lines.length; j++) {
 
@@ -97,11 +91,6 @@ rl.on('line', (line) => {
 
             if (colData[col]) {
                 process.stdout.write(`${j}|${colData[col]} \t`);
-                if (!(j in data)) {
-                    data[j] = [];
-                }
-                data[j].push( col );
-
                 // process.stdout.write(`${colData[0]}|${colData[col]} \t`);
                 if (validLines.includes(j) == false) {
                     validLines.push(j);
@@ -126,35 +115,21 @@ rl.on('line', (line) => {
         }
         output += "\n";
 
-        for (const [row, values] of Object.entries(data)) {
+        for (j=0; j<validLines.length; j++) {
+            var row = validLines[j];
             var colData = lines[row].split(',');
-            output += colData[0] + "," + colData[1] + ",";
+            output += row + "," + colData[1] + ",";
+            // output += colData[0] + "," + colData[1] + ",";
 
             for (i=0; i<columnNumbs.length; i++) {
                 var col = columnNumbs[i];
-                if (values.includes(col)) {
+                if (colData[col]) {
                     output += colData[col];
                 }
                 output += ",";
             }
             output += "\n";
         }
-
-        // for (j=0; j<validLines.length; j++) {
-        //     var row = validLines[j];
-        //     var colData = lines[row].split(',');
-        //     output += row + "," + colData[1] + ",";
-        //     // output += colData[0] + "," + colData[1] + ",";
-
-        //     for (i=0; i<columnNumbs.length; i++) {
-        //         var col = columnNumbs[i];
-        //         if (colData[col]) {
-        //             output += colData[col];
-        //         }
-        //         output += ",";
-        //     }
-        //     output += "\n";
-        // }
         fs.writeFileSync(program.outFile, output);
     }
 });
