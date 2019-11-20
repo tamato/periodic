@@ -13,6 +13,7 @@ program
    .option('-f, --file <file>', 'File to parse, default is ~/bin/dlog/latest.csv')
    .option('-u, --update', 'Update the latest.csv file')
    .option('-o, --out-file <file>', 'prints to a file !! not yet implemented !!')
+   .option('-q, --quiet', 'suppress output')
    .action(function (search) {
         query = search;
    }).on('--help', function (){
@@ -60,7 +61,9 @@ rl.on('line', (line) => {
 }).on('close', () => {
     columnHeaders = lines[0].split(',');
     var i,j,k;
-    console.log(`Searching for ${query}`)
+    if (typeof program.quiet === 'undefined') {
+        console.log(`Searching for ${query}`)
+    }
 
     // Collect column numbers
     for (i=0; i<columnHeaders.length; i++) {
@@ -70,15 +73,18 @@ rl.on('line', (line) => {
         }
     }
 
-    console.log("")
-    console.log("Printing Column header followed by the line number for the entry and its value")
-    // print out the contents of the columnHeaders
-    var validLines = [];
+    if (typeof program.quiet === 'undefined') {
+        console.log("")
+        console.log("Printing Column header followed by the line number for the entry and its value")
+    }
+
     var data = {};
     for (i=0; i<columnNumbs.length; i++) {
         var col = columnNumbs[i];
-        console.log("-------------------------------------");
-        console.log(`${columnHeaders[col]}`)
+        if (typeof program.quiet === 'undefined') {
+            console.log("-------------------------------------");
+            console.log(`${columnHeaders[col]}`)
+        }
 
         if ( i == 0 ) {
             data[0] = [columnHeaders[col]];
@@ -96,29 +102,24 @@ rl.on('line', (line) => {
             var colData = lines[j].split(',');
 
             if (colData[col]) {
-                process.stdout.write(`${j}|${colData[col]} \t`);
+                if (typeof program.quiet === 'undefined') {
+                    // use .write to suppress the use of newlines
+                    process.stdout.write(`${j}|${colData[col]} \t`);
+                }
                 if (!(j in data)) {
                     data[j] = [];
                 }
                 data[j].push( col );
-
-                // process.stdout.write(`${colData[0]}|${colData[col]} \t`);
-                if (validLines.includes(j) == false) {
-                    validLines.push(j);
-                }
             }
         }
 
-        console.log("")
-        console.log("")
+        if (typeof program.quiet === 'undefined') {
+            console.log("")
+            console.log("")
+        }
     }
 
     if (program.outFile) {
-        for (j=0; j<validLines.length; j++) {
-            var row = validLines[j];
-            var colData = lines[row].split(',');
-        }
-
         var output = "Count,Time,";
         for (i=0; i<columnNumbs.length; i++) {
             var col = columnNumbs[i];
@@ -140,21 +141,6 @@ rl.on('line', (line) => {
             output += "\n";
         }
 
-        // for (j=0; j<validLines.length; j++) {
-        //     var row = validLines[j];
-        //     var colData = lines[row].split(',');
-        //     output += row + "," + colData[1] + ",";
-        //     // output += colData[0] + "," + colData[1] + ",";
-
-        //     for (i=0; i<columnNumbs.length; i++) {
-        //         var col = columnNumbs[i];
-        //         if (colData[col]) {
-        //             output += colData[col];
-        //         }
-        //         output += ",";
-        //     }
-        //     output += "\n";
-        // }
         fs.writeFileSync(program.outFile, output);
     }
 });
