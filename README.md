@@ -8,8 +8,10 @@ sudo npm install -g
 sudo npm link
 
 # Assumptions
+The directory ~/logs exists; for storing all dlogs and csv's
 The directory ~/bin/dlog exists; for storing latest.csv used by this script and grabLatest.sh
 The script ~/bin/grabLatest.sh exists
+The tool dlogparser is globaly accessible for the script grabLatest.sh
 
 ## Contents of grabLatest.sh
 ```
