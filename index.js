@@ -83,8 +83,7 @@ rl.on('line', (line) => {
     output += '\n';
     output += 'Printing Column header followed by the line number for the entry and its value\n';
 
-    // Don't need thig because things are already in order.
-    // It may appear that they are not but that is because of the terminal not wrapping on whole words.
+    // Don't need this because things are already in order.
     // sortLines();
 
     var data = {};
@@ -100,7 +99,9 @@ rl.on('line', (line) => {
             var colData = lines[j].split(',');
             if (colData[col]) {
                 if (typeof program.quiet === 'undefined') {
-                    output += `${colData[0]}|${colData[col]}\t`; // `lines` WILL have a different count between the 2 scripts
+                   // 0 - count
+                   // 1 - time
+                    output += `${colData[0]}|${colData[1]}|${colData[col]}\t`; // `lines` WILL have a different count between the 2 scripts
                 }
 
                 // for outputing to a file
